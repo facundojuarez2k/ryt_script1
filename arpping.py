@@ -37,6 +37,9 @@ def validate_args(args: object):
 
 
 def is_valid_ipv4(address: str) -> bool:
+    '''
+    Retorna True si la cadena de caracteres address es una dirección IPv4 válida en formato dot-decimal (190.30.2.5)
+    '''
     ipv4_address_format = re.compile(
         r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
     match = re.fullmatch(ipv4_address_format, address)
