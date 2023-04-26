@@ -4,8 +4,10 @@ ARP Ping script
 import sys
 import argparse
 import re
+import time
 import scapy.all as scapy
 from scapy.layers.l2 import Ether, ARP
+
 
 def main():
     '''
@@ -14,9 +16,9 @@ def main():
     try:
         args = parse_args()
         validate_args(args)
-        
+
         protocol_type = 0x0800
-        operation = 1 # who-has
+        operation = 1  # who-has
         src_hw_address = scapy.get_if_hwaddr(args.device)
         src_protocol_address = scapy.get_if_addr(args.device)
         dst_protocol_address = args.target_ip_address
@@ -33,11 +35,26 @@ def main():
         # Armar trama Ethernet
         arp_packet[Ether].dst = "ff:ff:ff:ff:ff:ff"
 
-        scapy.srp1(arp_packet)
+        if args.count == 0:
+            while True:
+                send_packet(arp_packet)
+                time.sleep(1)
+        else:
+            for i in range(args.count):
+                send_packet(arp_packet)
+                time.sleep(1)
 
     except ValueError as ex1:
         print(f'ERROR: {str(ex1)}', file=sys.stderr)
     return 0
+
+
+def send_packet(packet) -> None:
+    '''
+    Envía el paquete utilizando la función srp1 de Scapy e imprime el resultado
+    '''
+    ans = scapy.srp1(packet, verbose=False)
+    print(f'Reply from {ans[ARP].psrc} [{ans[ARP].hwsrc}]')
 
 
 def parse_args() -> object:
