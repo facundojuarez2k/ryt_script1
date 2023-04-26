@@ -5,10 +5,53 @@ import sys
 import argparse
 import re
 import time
+import signal
 import scapy.all as scapy
 from scapy.layers.l2 import Ether, ARP
 
-def main():
+
+interrupted = False
+
+
+def signal_handler(sig, frame):
+    global interrupted
+    interrupted = True
+
+
+signal.signal(signal.SIGINT, signal_handler)
+
+
+class PacketSender:
+    def __init__(self, packet):
+        self.packet = packet
+        self.packets_sent = 0
+        self.packets_received = 0
+
+    def set_packet(self, packet):
+        self.packet = packet
+
+    def get_packet(self):
+        return self.packet
+
+    def print_summary(self):
+        print(
+            f'Sent {self.packets_sent} probes, Received {self.packets_received} responses')
+
+    def send_packet(self):
+        '''
+        Envía el paquete utilizando la función srp1 de Scapy e imprime el resultado por consola
+        '''
+        ans = scapy.srp1(self.packet, verbose=False, timeout=5)
+        self.packets_sent += 1
+
+        if ans:
+            self.packets_received += 1
+            print(f'Reply from {ans[ARP].psrc} [{ans[ARP].hwsrc}]')
+        else:
+            print('Request timeout')
+
+
+def main() -> any:
     '''
     Entrypoint
     '''
@@ -35,26 +78,29 @@ def main():
         # Armar trama Ethernet
         arp_packet[Ether].dst = "ff:ff:ff:ff:ff:ff"
 
-        if args.count == 0:
-            while True:
-                send_packet(arp_packet)
-                time.sleep(1)
-        else:
-            for i in range(args.count):
-                send_packet(arp_packet)
-                time.sleep(1)
+        # Iniciar envío de paquetes
+        sender = PacketSender(arp_packet)
+        iterations = 0
+
+        while True:
+            if interrupted:
+                break
+            
+            sender.send_packet()
+
+            if args.count > 0:
+                iterations += 1
+                if args.count == iterations:
+                    break
+
+            time.sleep(1)
+
+        sender.print_summary()
 
     except ValueError as ex1:
         print(f'ERROR: {str(ex1)}', file=sys.stderr)
+
     return 0
-
-
-def send_packet(packet) -> None:
-    '''
-    Envía el paquete utilizando la función srp1 de Scapy e imprime el resultado por consola
-    '''
-    ans = scapy.srp1(packet, verbose=False)
-    print(f'Reply from {ans[ARP].psrc} [{ans[ARP].hwsrc}]')
 
 
 def parse_args() -> object:
@@ -71,7 +117,7 @@ def parse_args() -> object:
     return parser.parse_args()
 
 
-def validate_args(args: object):
+def validate_args(args: object) -> None:
     '''
     Valida los argumentos del programa
     '''
