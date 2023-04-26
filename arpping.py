@@ -8,7 +8,6 @@ import time
 import scapy.all as scapy
 from scapy.layers.l2 import Ether, ARP
 
-
 def main():
     '''
     Entrypoint
@@ -17,8 +16,9 @@ def main():
         args = parse_args()
         validate_args(args)
 
-        protocol_type = 0x0800
-        operation = 1  # who-has
+        # Definir parámetros del paquete ARP
+        protocol_type = 0x0800  # IPv4
+        operation = 1           # who-has
         src_hw_address = scapy.get_if_hwaddr(args.device)
         src_protocol_address = scapy.get_if_addr(args.device)
         dst_protocol_address = args.target_ip_address
@@ -51,7 +51,7 @@ def main():
 
 def send_packet(packet) -> None:
     '''
-    Envía el paquete utilizando la función srp1 de Scapy e imprime el resultado
+    Envía el paquete utilizando la función srp1 de Scapy e imprime el resultado por consola
     '''
     ans = scapy.srp1(packet, verbose=False)
     print(f'Reply from {ans[ARP].psrc} [{ans[ARP].hwsrc}]')
