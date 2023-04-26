@@ -1,3 +1,6 @@
+'''
+ARP Ping script
+'''
 import sys
 import argparse
 import re
@@ -5,6 +8,9 @@ import re
 
 
 def main():
+    '''
+    Entrypoint
+    '''
     try:
         args = parse_args()
         validate_args(args)
@@ -31,7 +37,7 @@ def validate_args(args: object):
     '''
     Valida los argumentos del programa
     '''
-    if not hasattr(args, 'count') or args.count < 0:
+    if hasattr(args, 'count') is False or args.count < 0:
         raise ValueError(
             'El argumento count debe ser un entero mayor o igual a cero')
 
