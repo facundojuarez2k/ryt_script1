@@ -19,7 +19,7 @@ def main():
     return 0
 
 
-def parse_args():
+def parse_args() -> object:
     '''
     Captura y retorna los argumentos del programa
     '''
@@ -51,6 +51,11 @@ def is_valid_ipv4(address: str) -> bool:
     match = re.fullmatch(ipv4_address_format, address)
     return match is not None
 
+def is_valid_device(device: str) -> bool:
+    '''
+    Retorna True si la cadena de caracteres device corresponde a una interfaz de red valida del sistema
+    '''
+    raise NotImplementedError()
 
 if __name__ == '__main__':
     main()

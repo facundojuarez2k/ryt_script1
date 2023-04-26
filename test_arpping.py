@@ -1,4 +1,5 @@
-from arpping import is_valid_ipv4
+import pytest
+from arpping import (is_valid_ipv4, is_valid_device)
 
 
 class TestARPPing:
@@ -14,3 +15,7 @@ class TestARPPing:
         assert is_valid_ipv4("1000.2.3.4.5") is False
         assert is_valid_ipv4("abc") is False
         assert is_valid_ipv4("1,4,56.3") is False
+
+    def test_is_valid_device(self):
+        with pytest.raises(NotImplementedError):
+            is_valid_device("eth0")
