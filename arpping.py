@@ -21,51 +21,6 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 
-class PacketSender:
-    def __init__(self, packet):
-        self.packet = packet
-        self.packets_sent = 0
-        self.packets_received = 0
-
-    def set_packet(self, packet) -> None:
-        self.packet = packet
-        self.packets_sent = 0
-        self.packets_received = 0
-
-    def get_packet(self):
-        return self.packet
-
-    def get_summary(self) -> dict:
-        '''
-        Retorna la cantidad de paquetes enviados y respuestas recibidas
-        '''
-        return {
-            'probes': self.packets_sent,
-            'responses': self.packets_received
-        }
-
-    def send_packet(self) -> any:
-        '''
-        Envía el paquete utilizando la función srp1 de Scapy e imprime el resultado por consola
-        '''
-        ans = scapy.srp1(self.packet, verbose=False, timeout=5)
-        self.packets_sent += 1
-
-        if ans:
-            self.packets_received += 1
-            return {
-                'timeout': False,
-                'psrc': ans[ARP].psrc,
-                'hwsrc': ans[ARP].hwsrc
-            }
-        else:
-            return {
-                'timeout': True,
-                'psrc': None,
-                'hwsrc': None
-            }
-
-
 def main():
     '''
     Entrypoint
@@ -94,20 +49,23 @@ def main():
         arp_packet[Ether].dst = "ff:ff:ff:ff:ff:ff"
 
         # Iniciar envío de paquetes
-        sender = PacketSender(arp_packet)
         iterations = 0
+        packets_sent = 0
+        packets_received = 0
 
         while True:
             if interrupted:
                 break
 
-            result = sender.send_packet()
+            ans = scapy.srp1(arp_packet, verbose=False, timeout=5)
+            packets_sent += 1
 
             # Imprimir resultado
-            if result['timeout'] is True:
-                print('Request timeout')
+            if ans:
+                packets_received += 1
+                print(f'Reply from {ans[ARP].psrc} [{ans[ARP].hwsrc}]')
             else:
-                print(f'Reply from {result["psrc"]} [{result["hwsrc"]}]')
+                print('Request timeout')
 
             if args.count > 0:
                 iterations += 1
@@ -116,9 +74,9 @@ def main():
 
             time.sleep(1)
 
-        summary = sender.get_summary()
+        # Imprimir resumen
         print(
-            f'Sent {summary.probes} probes, Received {summary.responses} responses')
+            f'Sent {packets_sent} probes, Received {packets_received} responses')
 
     except ValueError as ex1:
         print(f'ERROR: {str(ex1)}', file=sys.stderr)
