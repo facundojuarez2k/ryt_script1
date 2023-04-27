@@ -9,7 +9,7 @@ import signal
 import scapy.all as scapy
 from scapy.layers.l2 import Ether, ARP
 
-
+# Manejar Ctrl + C
 interrupted = False
 
 
@@ -34,12 +34,15 @@ class PacketSender:
         return self.packet
 
     def get_summary(self) -> dict:
+        '''
+        Retorna la cantidad de paquetes enviados y respuestas recibidas
+        '''
         return {
             'probes': self.packets_sent,
             'responses': self.packets_received
         }
 
-    def send_packet(self) -> None:
+    def send_packet(self) -> any:
         '''
         Envía el paquete utilizando la función srp1 de Scapy e imprime el resultado por consola
         '''
@@ -48,9 +51,17 @@ class PacketSender:
 
         if ans:
             self.packets_received += 1
-            print(f'Reply from {ans[ARP].psrc} [{ans[ARP].hwsrc}]')
+            return {
+                'timeout': False,
+                'psrc': ans[ARP].psrc,
+                'hwsrc': ans[ARP].hwsrc
+            }
         else:
-            print('Request timeout')
+            return {
+                'timeout': True,
+                'psrc': None,
+                'hwsrc': None
+            }
 
 
 def main():
@@ -88,7 +99,13 @@ def main():
             if interrupted:
                 break
 
-            sender.send_packet()
+            result = sender.send_packet()
+
+            # Imprimir resultado
+            if result['timeout'] is True:
+                print('Request timeout')
+            else:
+                print(f'Reply from {result["psrc"]} [{result["hwsrc"]}]')
 
             if args.count > 0:
                 iterations += 1
