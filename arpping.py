@@ -129,7 +129,7 @@ def validate_args(args: object) -> None:
             f'Value {args.target_ip_address} is not a valid IPv4 address')
     if is_valid_device(args.device) is False:
         raise ValueError(
-            f'Interface {args.device} does not exist in the system')
+            f'Invalid device {args.device}')
 
 
 def is_valid_ipv4(address: str) -> bool:
