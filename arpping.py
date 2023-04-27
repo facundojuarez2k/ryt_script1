@@ -85,7 +85,7 @@ def main() -> any:
         while True:
             if interrupted:
                 break
-            
+
             sender.send_packet()
 
             if args.count > 0:
@@ -109,11 +109,11 @@ def parse_args() -> object:
     '''
     parser = argparse.ArgumentParser(description='ARP Ping')
     parser.add_argument(dest='target_ip_address', type=str,
-                        help='Dirección IPv4 a consultar')
+                        help='Destination IP Address')
     parser.add_argument('--count', '-c', dest='count', type=int,
-                        help='Cantidad de mensajes ARP who-has. Admite valores enteros mayores o iguales a 0. El valor 0 equivale a una cantidad infinita. (Default = 0) (Opcional)', default=0)
+                        help='Amount of who-has messages to send. Allows integer values greater than or equal to 0. Setting this flag to 0 implies sending packets indefinitely. (Default = 0) (Optional)', default=0)
     parser.add_argument('--device', '-d', dest='device', type=str,
-                        help='Interfaz de red a utilizar (Requerido)', required=True)
+                        help='Network interface to use (Required)', required=True)
     return parser.parse_args()
 
 
@@ -123,13 +123,13 @@ def validate_args(args: object) -> None:
     '''
     if hasattr(args, 'count') is False or args.count < 0:
         raise ValueError(
-            'El argumento count debe ser un entero mayor o igual a cero')
+            'Argument "cout" must be an integer value greater than or equal to 0')
     if is_valid_ipv4(args.target_ip_address) is False:
         raise ValueError(
-            f'Dirección {args.target_ip_address} no es una dirección IPv4 no válida')
+            f'Value {args.target_ip_address} is not a valid IPv4 address')
     if is_valid_device(args.device) is False:
         raise ValueError(
-            f'Interfaz {args.device} no encontrada')
+            f'Interface {args.device} does not exist in the system')
 
 
 def is_valid_ipv4(address: str) -> bool:
