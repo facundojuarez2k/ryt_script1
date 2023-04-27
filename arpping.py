@@ -29,6 +29,8 @@ class PacketSender:
 
     def set_packet(self, packet) -> None:
         self.packet = packet
+        self.packets_sent = 0
+        self.packets_received = 0
 
     def get_packet(self):
         return self.packet
