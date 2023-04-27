@@ -27,17 +27,19 @@ class PacketSender:
         self.packets_sent = 0
         self.packets_received = 0
 
-    def set_packet(self, packet):
+    def set_packet(self, packet) -> None:
         self.packet = packet
 
     def get_packet(self):
         return self.packet
 
-    def print_summary(self):
-        print(
-            f'Sent {self.packets_sent} probes, Received {self.packets_received} responses')
+    def get_summary(self) -> dict:
+        return {
+            'probes': self.packets_sent,
+            'responses': self.packets_received
+        }
 
-    def send_packet(self):
+    def send_packet(self) -> None:
         '''
         Envía el paquete utilizando la función srp1 de Scapy e imprime el resultado por consola
         '''
@@ -51,7 +53,7 @@ class PacketSender:
             print('Request timeout')
 
 
-def main() -> any:
+def main():
     '''
     Entrypoint
     '''
@@ -95,7 +97,9 @@ def main() -> any:
 
             time.sleep(1)
 
-        sender.print_summary()
+        summary = sender.get_summary()
+        print(
+            f'Sent {summary.probes} probes, Received {summary.responses} responses')
 
     except ValueError as ex1:
         print(f'ERROR: {str(ex1)}', file=sys.stderr)
