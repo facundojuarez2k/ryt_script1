@@ -31,6 +31,7 @@ def main():
         validate_args(args)
     except ValueError as ex1:
         print(f'ERROR: {str(ex1)}', file=sys.stderr)
+        return 0
 
     # Definir parámetros del paquete ARP
     protocol_type = 0x0800  # IPv4
