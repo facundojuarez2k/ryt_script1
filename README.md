@@ -30,11 +30,11 @@ options:
 
 ## Ejemplos
 
-#### Envíar 3 paquetes ARP request a la dirección IP 192.168.50.3 a través de la interfaz enp0s3
+#### Enviar 3 paquetes ARP request a la dirección IP 192.168.50.3 a través de la interfaz enp0s3
 
 `sudo python3 arping.py 192.168.50.3 -d enp0s3 -c 3`
 
-#### Envíar paquetes ARP request indefinidamente a la dirección IP 192.168.50.3 a través de la interfaz enp0s3
+#### Enviar paquetes ARP request indefinidamente a la dirección IP 192.168.50.3 a través de la interfaz enp0s3
 
 `sudo python3 arping.py 192.168.50.3 -d enp0s3`
 
