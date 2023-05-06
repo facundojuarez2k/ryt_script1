@@ -1,5 +1,5 @@
 import pytest
-from arpping import (is_valid_ipv4, is_valid_device)
+from arping import (is_valid_ipv4, is_valid_device)
 
 
 class TestARPPing:

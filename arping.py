@@ -26,61 +26,60 @@ def main():
     '''
     Entrypoint
     '''
+    args = parse_args()
     try:
-        args = parse_args()
         validate_args(args)
-
-        # Definir parámetros del paquete ARP
-        protocol_type = 0x0800  # IPv4
-        operation = 1           # who-has
-        src_hw_address = scapy.get_if_hwaddr(args.device)
-        src_protocol_address = scapy.get_if_addr(args.device)
-        dst_protocol_address = args.target_ip_address
-
-        arp_packet = Ether()/ARP()
-
-        # Construir paquete ARP
-        arp_packet[ARP].ptype = protocol_type
-        arp_packet[ARP].op = operation
-        arp_packet[ARP].hwsrc = src_hw_address
-        arp_packet[ARP].psrc = src_protocol_address
-        arp_packet[ARP].pdst = dst_protocol_address
-
-        # Armar trama Ethernet
-        arp_packet[Ether].dst = "ff:ff:ff:ff:ff:ff"
-
-        # Iniciar envío de paquetes
-        iterations = 0
-        packets_sent = 0
-        packets_received = 0
-
-        while True:
-            if interrupted:
-                break
-
-            ans = scapy.srp1(arp_packet, verbose=False, timeout=5)
-            packets_sent += 1
-
-            # Imprimir resultado
-            if ans:
-                packets_received += 1
-                print(f'Reply from {ans[ARP].psrc} [{ans[ARP].hwsrc}]')
-            else:
-                print('Request timeout')
-
-            if args.count > 0:
-                iterations += 1
-                if args.count == iterations:
-                    break
-
-            time.sleep(1)
-
-        # Imprimir resumen
-        print(
-            f'Sent {packets_sent} probes, Received {packets_received} responses')
-
     except ValueError as ex1:
         print(f'ERROR: {str(ex1)}', file=sys.stderr)
+
+    # Definir parámetros del paquete ARP
+    protocol_type = 0x0800  # IPv4
+    operation = 1           # who-has
+    src_hw_address = scapy.get_if_hwaddr(args.device)
+    src_protocol_address = scapy.get_if_addr(args.device)
+    dst_protocol_address = args.target_ip_address
+
+    arp_packet = Ether()/ARP()
+
+    # Construir paquete ARP
+    arp_packet[ARP].ptype = protocol_type
+    arp_packet[ARP].op = operation
+    arp_packet[ARP].hwsrc = src_hw_address
+    arp_packet[ARP].psrc = src_protocol_address
+    arp_packet[ARP].pdst = dst_protocol_address
+
+    # Armar trama Ethernet
+    arp_packet[Ether].dst = "ff:ff:ff:ff:ff:ff"
+
+    # Iniciar envío de paquetes
+    iterations = 0
+    packets_sent = 0
+    packets_received = 0
+
+    while True:
+        if interrupted:
+            break
+
+        ans = scapy.srp1(arp_packet, verbose=False, timeout=5)
+        packets_sent += 1
+
+        # Imprimir resultado
+        if ans:
+            packets_received += 1
+            print(f'Reply from {ans[ARP].psrc} [{ans[ARP].hwsrc}]')
+        else:
+            print('Request timeout')
+
+        if args.count > 0:
+            iterations += 1
+            if args.count == iterations:
+                break
+
+        time.sleep(1)
+
+    # Imprimir resumen
+    print(
+        f'Sent {packets_sent} probes, Received {packets_received} responses')
 
     return 0
 
