@@ -61,7 +61,7 @@ def main():
         if interrupted:
             break
 
-        ans = scapy.srp1(arp_packet, verbose=False, timeout=5)
+        ans = scapy.srp1(arp_packet, verbose=False, iface=args.device, timeout=5)
         packets_sent += 1
 
         # Imprimir resultado
